@@ -67,7 +67,6 @@ class Pic {
       if (this.isPositionInBounds_(nextPosition)) {
         return;
       }
-      console.log('bounce');
       switch (this.direction_) {
         case 'NW':
           this.direction_ = 'NE';
