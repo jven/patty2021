@@ -5,26 +5,77 @@ const main = () => {
 const resetGame = () => {
   getStage().innerHtml = '';
 
-  const testPic = new Pic(
-      'pics/a.jpg',
-      /* size= */ [500, 300],
-      /* position= */ [100, 300],
-      /* direction= */ 'SE',
-      /* speed= */ 0.4);
-  testPic.renderIntoStage(getStage());
+  const round = new Round([
+    new Pic(
+        'pics/a.jpg',
+        /* size= */ [500, 300],
+        /* position= */ [100, 100],
+        /* direction= */ 'NW',
+        /* speed= */ 0.4),
+    new Pic(
+        'pics/a.jpg',
+        /* size= */ [500, 300],
+        /* position= */ [200, 300],
+        /* direction= */ 'NE',
+        /* speed= */ 0.4),
+    new Pic(
+        'pics/a.jpg',
+        /* size= */ [500, 300],
+        /* position= */ [100, 500],
+        /* direction= */ 'SE',
+        /* speed= */ 0.4)
+  ], /* winningIndex= */ 1);
+  round.renderIntoStage(getStage());
 
-  requestAnimationFrame(() => onAnimationFrame(testPic));
+  requestAnimationFrame(() => onAnimationFrame(round));
 };
 
-const onAnimationFrame = (pic) => {
-  pic.update();
+const onAnimationFrame = (round) => {
+  round.update();
 
-  requestAnimationFrame(() => onAnimationFrame(pic));
+  requestAnimationFrame(() => onAnimationFrame(round));
 };
 
 const getStage = () => {
   return document.getElementById('stage');
 };
+
+class Round {
+  constructor(pics, winningIndex) {
+    this.pics_ = pics.concat();
+    this.winningIndex_ = winningIndex;
+  }
+
+  renderIntoStage(stageEl) {
+    for (let i = 0; i < this.pics_.length; i++) {
+      const pic = this.pics_[i];
+      pic.renderIntoStage(stageEl);
+      pic.setOnClickHandler(() => {
+        const didPattyWin = i == this.winningIndex_;
+        this.onRoundEnd_(didPattyWin);
+      });
+    }
+  }
+
+  onRoundEnd_(didPattyWin) {
+    for (const pic of this.pics_) {
+      pic.markEndOfRound();
+    }
+  }
+
+  update() {
+    for (const pic of this.pics_) {
+      pic.update();
+    }
+  }
+
+  dispose() {
+    for (const pic of this.pics_) {
+      pic.dispose();
+    }
+    this.pics_ = [];
+  }
+}
 
 class Pic {
   constructor(imageUrl, size, position, direction, speed) {
@@ -46,6 +97,14 @@ class Pic {
     stageEl.appendChild(this.imageEl_);
   }
 
+  setOnClickHandler(handlerFn) {
+    this.imageEl_.onclick = handlerFn;
+  }
+
+  markEndOfRound() {
+    this.speed_ = 0;
+  }
+
   update() {
     const nowTime = Date.now();
     const elapsedTimeMs = nowTime - this.lastUpdateTime_;
@@ -58,7 +117,7 @@ class Pic {
   }
 
   dispose() {
-    this.imageEl_.removeChild();
+    this.imageEl_.remove();
   }
 
   maybeBounce_(elapsedTimeMs) {
