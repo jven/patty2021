@@ -10,7 +10,7 @@ const resetGame = () => {
       /* size= */ [500, 300],
       /* position= */ [100, 300],
       /* direction= */ 'SE',
-      /* speed= */ 10);
+      /* speed= */ 0.4);
   testPic.renderIntoStage(getStage());
 
   requestAnimationFrame(() => onAnimationFrame(testPic));
@@ -62,26 +62,50 @@ class Pic {
   }
 
   maybeBounce_(elapsedTimeMs) {
-    for (let i = 0; i < 4; i++) {
-      const nextPosition = this.calculateNextPosition_(this.direction_, elapsedTimeMs);
-      if (this.isPositionInBounds_(nextPosition)) {
-        return;
-      }
-      switch (this.direction_) {
-        case 'NW':
+    const TEST_DISTANCE = 10;
+    switch (this.direction_) {
+      case 'NW':
+        if (!this.isAddInBounds_(-TEST_DISTANCE, 0) && this.isAddInBounds_(0, -TEST_DISTANCE)) {
           this.direction_ = 'NE';
-          break;
-        case 'NE':
-          this.direction_ = 'SE';
-          break;
-        case 'SE':
+        } else if (!this.isAddInBounds_(0, -TEST_DISTANCE) && this.isAddInBounds_(-TEST_DISTANCE, 0)) {
           this.direction_ = 'SW';
-          break;
-        case 'SW':
+        } else if (!this.isAddInBounds_(-TEST_DISTANCE, -TEST_DISTANCE)) {
+          this.direction_ = 'SE';
+        }
+        break;
+      case 'NE':
+        if (!this.isAddInBounds_(TEST_DISTANCE, 0) && this.isAddInBounds_(0, -TEST_DISTANCE)) {
           this.direction_ = 'NW';
-          break;
-      }
+        } else if (!this.isAddInBounds_(0, -TEST_DISTANCE) && this.isAddInBounds_(TEST_DISTANCE, 0)) {
+          this.direction_ = 'SE';
+        } else if (!this.isAddInBounds_(TEST_DISTANCE, -TEST_DISTANCE)) {
+          this.direction_ = 'SW';
+        }
+        break;
+      case 'SE':
+        if (!this.isAddInBounds_(TEST_DISTANCE, 0) && this.isAddInBounds_(0, TEST_DISTANCE)) {
+          this.direction_ = 'SW';
+        } else if (!this.isAddInBounds_(0, TEST_DISTANCE) && this.isAddInBounds_(TEST_DISTANCE, 0)) {
+          this.direction_ = 'NE';
+        } else if (!this.isAddInBounds_(TEST_DISTANCE, TEST_DISTANCE)) {
+          this.direction_ = 'NW';
+        }
+        break;
+      case 'SW':
+        if (!this.isAddInBounds_(-TEST_DISTANCE, 0) && this.isAddInBounds_(0, TEST_DISTANCE)) {
+          this.direction_ = 'SE';
+        } else if (!this.isAddInBounds_(0, TEST_DISTANCE) && this.isAddInBounds_(-TEST_DISTANCE, 0)) {
+          this.direction_ = 'NW';
+        } else if (!this.isAddInBounds_(-TEST_DISTANCE, TEST_DISTANCE)) {
+          this.direction_ = 'NE';
+        }
+        break;
     }
+  }
+
+  isAddInBounds_(dLeft, dTop) {
+    const addPos = [this.position_[0] + dLeft, this.position_[1] + dTop];
+    return this.isPositionInBounds_(addPos);
   }
 
   calculateNextPosition_(direction, elapsedTimeMs) {
@@ -106,7 +130,7 @@ class Pic {
         break;
     }
 
-    return [this.position_[0] + dLeft * this.speed_, this.position_[1] + dTop * this.speed_];
+    return [this.position_[0] + dLeft * elapsedTimeMs * this.speed_, this.position_[1] + dTop * elapsedTimeMs * this.speed_];
   }
 
   isPositionInBounds_(position) {
