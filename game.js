@@ -9,8 +9,6 @@ const resetGame = (picUrls) => {
 
   const round = generateRandomRound(picUrls, /* numPics= */ 3);
   round.renderIntoStage(getStage());
-
-  requestAnimationFrame(() => onAnimationFrame(round));
 };
 
 const generateRandomRound = (picUrls, numPics) => {
@@ -60,13 +58,6 @@ const getMonthName = (month) => {
       : "???";
 };
 
-// TODO(jven): Delete requestAnimationFrame stuff.
-const onAnimationFrame = (round) => {
-  round.update();
-
-  requestAnimationFrame(() => onAnimationFrame(round));
-};
-
 const getStage = () => {
   return document.getElementById('stage');
 };
@@ -93,12 +84,6 @@ class Round {
     for (const pic of this.pics_) {
       // TODO(jven): Decorate pic with win/loss.
       pic.markEndOfRound();
-    }
-  }
-
-  update() {
-    for (const pic of this.pics_) {
-      pic.update();
     }
   }
 
@@ -131,9 +116,6 @@ class Pic {
   }
 
   markEndOfRound() {
-  }
-
-  update() {
   }
 
   dispose() {
