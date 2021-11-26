@@ -1,4 +1,4 @@
-const PICS = [
+const PIC_URLS = [
   'pics/20160903.jpg',
   'pics/20160909.jpg',
   'pics/20160924.jpg',

@@ -1,20 +1,66 @@
+const PIC_URL_PREFIX_LENGTH = "pics/".length;
+
 const main = () => {
-  resetGame(PICS);
+  resetGame(PIC_URLS);
 };
 
-const resetGame = (pics) => {
+const resetGame = (picUrls) => {
   getStage().innerHtml = '';
 
-  const randomPicUrl = pics[Math.floor(Math.random() * pics.length)];
-
-  const round = new Round([
-    new Pic(randomPicUrl, /* position= */ [100, 100])
-  ], /* winningIndex= */ 0);
+  const round = generateRandomRound(picUrls, /* numPics= */ 3);
   round.renderIntoStage(getStage());
 
   requestAnimationFrame(() => onAnimationFrame(round));
 };
 
+const generateRandomRound = (picUrls, numPics) => {
+  const roundPicUrls = [];
+  const roundPicDates = new Set();
+  const roundPics = [];
+  let oldestDate = 999999;
+  let oldestDateIndex = -1;
+  for (let i = 0; i < numPics; i++) {
+    const picUrl = chooseRandomPicUrl(picUrls);
+    const picDate = getDateFromPicUrl(picUrl);
+    if (roundPicDates.has(picDate[0])) {
+      // We chose two pics with the same date, try again.
+      console.log('Collision while generating round, trying again...');
+      return generateRandomRound(picUrls, numPics);
+    }
+
+    roundPicUrls.push(picUrl);
+    roundPicDates.add(picDate[0]);
+    if (picDate[0] < oldestDate) {
+      oldestDate = picDate[0];
+      oldestDateIndex = i;
+    }
+
+    // TODO(jven): Pass in pretty date to Pic.
+    roundPics.push(new Pic(picUrl, /* position= */ [(i + 1) * 100, (i + 1) * 100]));
+  }
+
+  return new Round(roundPics, /* winningIndex= */ oldestDateIndex);
+};
+
+const chooseRandomPicUrl = (picUrls) => {
+  return picUrls[Math.floor(Math.random() * picUrls.length)];
+};
+
+const getDateFromPicUrl = (picUrl) => {
+  const year = parseInt(picUrl.slice(PIC_URL_PREFIX_LENGTH, PIC_URL_PREFIX_LENGTH + 4));
+  const month = parseInt(picUrl.slice(PIC_URL_PREFIX_LENGTH + 4, PIC_URL_PREFIX_LENGTH + 6));
+  const d = [year * 100 + month, `${getMonthName(month)} ${year}`];
+  console.log(`picUrl = ${picUrl}, date = ${d}`);
+  return d;
+};
+
+const getMonthName = (month) => {
+  return (month >= 1 && month <= 12)
+      ? ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][month]
+      : "???";
+};
+
+// TODO(jven): Delete requestAnimationFrame stuff.
 const onAnimationFrame = (round) => {
   round.update();
 
@@ -37,6 +83,7 @@ class Round {
       pic.renderIntoStage(stageEl);
       pic.setOnClickHandler(() => {
         const didPattyWin = i == this.winningIndex_;
+        console.log(`didPattyWin? ${didPattyWin}`);
         this.onRoundEnd_(didPattyWin);
       });
     }
@@ -44,6 +91,7 @@ class Round {
 
   onRoundEnd_(didPattyWin) {
     for (const pic of this.pics_) {
+      // TODO(jven): Decorate pic with win/loss.
       pic.markEndOfRound();
     }
   }
