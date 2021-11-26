@@ -1,3 +1,40 @@
-#stage .pic {
+#stage div.pic {
   position: absolute;
+}
+
+#stage div.pic img {
+  z-index: 99;
+}
+
+#stage div.pic div.prettyDate {
+  position: absolute;
+  text-align: center;
+  font-size: 80px;
+  width: 300px;
+  height: 100px;
+  left: calc(50% - 150px);
+  top: calc(50% - 50px);
+  opacity: 0;
+  z-index: 100;
+}
+
+#stage div.pic.yay img,
+#stage div.pic.dang img,
+#stage div.pic.info img {
+  opacity: 0.8;
+}
+
+#stage div.pic.yay div.prettyDate {
+  opacity: 1;
+  color: green;
+}
+
+#stage div.pic.dang div.prettyDate {
+  opacity: 1;
+  color: red;
+}
+
+#stage div.pic.info div.prettyDate {
+  opacity: 1;
+  color: black;
 }

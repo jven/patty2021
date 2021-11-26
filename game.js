@@ -5,7 +5,7 @@ const main = () => {
 };
 
 const resetGame = (picUrls) => {
-  getStage().innerHtml = '';
+  getStage().innerHTML = '';
 
   const round = generateRandomRound(picUrls, /* numPics= */ 3);
   round.renderIntoStage(getStage());
@@ -34,7 +34,10 @@ const generateRandomRound = (picUrls, numPics) => {
     }
 
     // TODO(jven): Pass in pretty date to Pic.
-    roundPics.push(new Pic(picUrl, /* position= */ [(i + 1) * 100, (i + 1) * 100]));
+    roundPics.push(new Pic(
+        picUrl,
+        /* position= */ [(i + 1) * 100, (i + 1) * 100],
+        /* prettyDate= */ picDate[1]));
   }
 
   return new Round(roundPics, /* winningIndex= */ oldestDateIndex);
@@ -54,7 +57,7 @@ const getDateFromPicUrl = (picUrl) => {
 
 const getMonthName = (month) => {
   return (month >= 1 && month <= 12)
-      ? ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][month]
+      ? ["!!!", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][month]
       : "???";
 };
 
@@ -73,17 +76,23 @@ class Round {
       const pic = this.pics_[i];
       pic.renderIntoStage(stageEl);
       pic.setOnClickHandler(() => {
-        const didPattyWin = i == this.winningIndex_;
-        console.log(`didPattyWin? ${didPattyWin}`);
-        this.onRoundEnd_(didPattyWin);
+        this.onRoundEnd_(/* tappedIndex= */ i);
       });
     }
   }
 
-  onRoundEnd_(didPattyWin) {
-    for (const pic of this.pics_) {
-      // TODO(jven): Decorate pic with win/loss.
-      pic.markEndOfRound();
+  onRoundEnd_(tappedIndex) {
+    for (let i = 0; i < this.pics_.length; i++) {
+      const pic = this.pics_[i];
+      let picClass;
+      if (i == this.winningIndex_) {
+        picClass = 'yay';
+      } else if (i == tappedIndex) {
+        picClass = 'dang';
+      } else {
+        picClass = 'info';
+      }
+      pic.showDateAndRemoveClickHandler(picClass);
     }
   }
 
@@ -96,30 +105,38 @@ class Round {
 }
 
 class Pic {
-  constructor(imageUrl, position) {
-    this.position_ = position.concat();
+  constructor(imageUrl, position, prettyDate) {
 
-    this.imageEl_ = document.createElement('img');
-    this.imageEl_.src = imageUrl;
-    this.imageEl_.style.left = `${position[0]}px`;
-    this.imageEl_.style.top = `${position[1]}px`;
-    this.imageEl_.classList.add('pic');
+    this.containerEl_ = document.createElement('div');
+    this.containerEl_.style.left = `${position[0]}px`;
+    this.containerEl_.style.top = `${position[1]}px`;
+    this.containerEl_.classList.add('pic');
+    
+    const imageEl = document.createElement('img');
+    imageEl.src = imageUrl;
+    this.containerEl_.appendChild(imageEl);
+
+    const prettyDateEl = document.createElement('div');
+    prettyDateEl.classList.add('prettyDate');
+    prettyDateEl.innerHTML = prettyDate;
+    this.containerEl_.appendChild(prettyDateEl);
   }
 
   renderIntoStage(stageEl) {
-    this.lastUpdateTime_ = Date.now();
-    stageEl.appendChild(this.imageEl_);
+    stageEl.appendChild(this.containerEl_);
   }
 
   setOnClickHandler(handlerFn) {
-    this.imageEl_.onclick = handlerFn;
+    this.containerEl_.onclick = handlerFn;
   }
 
-  markEndOfRound() {
+  showDateAndRemoveClickHandler(picClass) {
+    this.containerEl_.onclick = () => {};
+    this.containerEl_.classList.add(picClass);
   }
 
   dispose() {
-    this.imageEl_.remove();
+    this.containerEl_.remove();
   }
 }
 
