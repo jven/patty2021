@@ -1,30 +1,20 @@
 const main = () => {
-  resetGame();
+  resetGame(PICS);
 };
 
-const resetGame = () => {
+const resetGame = (pics) => {
   getStage().innerHtml = '';
+
+  const randomPicUrl = pics[Math.floor(Math.random() * pics.length)];
 
   const round = new Round([
     new Pic(
-        'pics/a.jpg',
+        randomPicUrl,
         /* size= */ [500, 300],
         /* position= */ [100, 100],
         /* direction= */ 'NW',
-        /* speed= */ 0.4),
-    new Pic(
-        'pics/a.jpg',
-        /* size= */ [500, 300],
-        /* position= */ [200, 300],
-        /* direction= */ 'NE',
-        /* speed= */ 0.4),
-    new Pic(
-        'pics/a.jpg',
-        /* size= */ [500, 300],
-        /* position= */ [100, 500],
-        /* direction= */ 'SE',
-        /* speed= */ 0.4)
-  ], /* winningIndex= */ 1);
+        /* speed= */ 0)
+  ], /* winningIndex= */ 0);
   round.renderIntoStage(getStage());
 
   requestAnimationFrame(() => onAnimationFrame(round));
