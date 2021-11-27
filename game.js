@@ -1,20 +1,21 @@
 const PIC_URL_PREFIX_LENGTH = "pics/".length;
-const PIC_SIZING_TIME_MS = 100;
+const PRELOAD_INTERVAL_MS = 300;
 const BETWEEN_ROUND_TIME_MS = 1000;
 const NUM_ROUNDS = 3;
 const COUNTDOWN_TIME_MS = 30000;
 
 const main = () => {
-  preloadImages();
-  const game = new Game(
-      document.getElementById('stage'),
-      document.getElementById('timer'),
-      document.getElementById('score'),
-      document.getElementById('preload'),
-      PIC_URLS,
-      NUM_ROUNDS,
-      COUNTDOWN_TIME_MS);
-  game.start();
+  preloadImages().then(() => {
+    const game = new Game(
+        document.getElementById('stage'),
+        document.getElementById('timer'),
+        document.getElementById('score'),
+        document.getElementById('preload'),
+        PIC_URLS,
+        NUM_ROUNDS,
+        COUNTDOWN_TIME_MS);
+    game.start();
+  });
 };
 
 const preloadImages = () => {
@@ -25,6 +26,28 @@ const preloadImages = () => {
     imageEl.src = PIC_URLS[i];
     preloadEl.appendChild(imageEl);
   }
+
+  const p = new Promise((resolveFn, rejectFn) => {
+    checkPreloadEl(preloadEl, resolveFn);
+  });
+  return p;
+};
+
+const checkPreloadEl = (preloadEl, resolveFn) => {
+  let numLoaded = 0;
+  for (let i = 0; i < preloadEl.children.length; i++) {
+    const child = preloadEl.children[i];
+    if (child.offsetWidth * child.offsetHeight > 0) {
+      numLoaded++;
+    }
+  }
+  console.log(`Preloaded ${numLoaded} of ${preloadEl.children.length}`);
+  if (numLoaded >= preloadEl.children.length) {
+    resolveFn();
+    return;
+  }
+
+  setTimeout(() => checkPreloadEl(preloadEl, resolveFn), PRELOAD_INTERVAL_MS);
 };
 
 const chooseRandomPicUrl = (picUrls) => {
@@ -178,13 +201,11 @@ class Round {
       });
     }
 
-    setTimeout(() => {
-      let currentTop = 0;
-      for (let i = 0; i < this.pics_.length; i++) {
-        this.pics_[i].showAtPosition(0, currentTop);
-        currentTop += this.pics_[i].getSize()[1];
-      }
-    }, PIC_SIZING_TIME_MS);
+    let currentTop = 0;
+    for (let i = 0; i < this.pics_.length; i++) {
+      this.pics_[i].showAtPosition(0, currentTop);
+      currentTop += this.pics_[i].getSize()[1];
+    }
   }
 
   endOnTimeout() {
