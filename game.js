@@ -33,10 +33,11 @@ const generateRandomRound = (picUrls, numPics) => {
       oldestDateIndex = i;
     }
 
-    // TODO(jven): Pass in pretty date to Pic.
+    const centerLeft = window.innerWidth / 2;
+    const centerTop = (2 * i + 1) * (window.innerHeight / (2 * numPics));
     roundPics.push(new Pic(
         picUrl,
-        /* position= */ [(i + 1) * 100, (i + 1) * 100],
+        [centerLeft, centerTop],
         /* prettyDate= */ picDate[1]));
   }
 
@@ -106,12 +107,12 @@ class Round {
 
 class Pic {
   constructor(imageUrl, position, prettyDate) {
+    this.position_ = position;
 
     this.containerEl_ = document.createElement('div');
-    this.containerEl_.style.left = `${position[0]}px`;
-    this.containerEl_.style.top = `${position[1]}px`;
     this.containerEl_.classList.add('pic');
-    
+    this.containerEl_.classList.add('hidden');
+
     const imageEl = document.createElement('img');
     imageEl.src = imageUrl;
     this.containerEl_.appendChild(imageEl);
@@ -124,6 +125,11 @@ class Pic {
 
   renderIntoStage(stageEl) {
     stageEl.appendChild(this.containerEl_);
+    setTimeout(() => {
+      this.containerEl_.style.left = `calc(${this.position_[0]}px - ${this.containerEl_.offsetWidth / 2}px)`;
+      this.containerEl_.style.top = `calc(${this.position_[1]}px - ${this.containerEl_.offsetHeight / 2}px)`;
+      this.containerEl_.classList.remove('hidden');
+    }, 100);
   }
 
   setOnClickHandler(handlerFn) {
