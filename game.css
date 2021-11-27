@@ -17,6 +17,7 @@
 }
 
 #timer, #score {
+  font-family: 'Cairo', sans-serif;
   font-size: 60px;
 }
 
