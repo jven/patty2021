@@ -1,3 +1,6 @@
+const WINDOW_WIDTH = window.innerWidth;
+const WINDOW_HEIGHT = window.innerHeight;
+
 const PIC_URL_PREFIX_LENGTH = "pics/".length;
 const PIC_SIZING_TIME_MS = 100;
 const BETWEEN_ROUND_TIME_MS = 1000;
@@ -5,6 +8,7 @@ const NUM_ROUNDS = 10;
 const COUNTDOWN_TIME_MS = 30000;
 
 const main = () => {
+  preloadImages();
   const game = new Game(
       document.getElementById('stage'),
       document.getElementById('timer'),
@@ -13,6 +17,15 @@ const main = () => {
       NUM_ROUNDS,
       COUNTDOWN_TIME_MS);
   game.start();
+};
+
+const preloadImages = () => {
+  const preloadEl = document.getElementById('preload');
+  for (let i = 0; i < PIC_URLS.length; i++) {
+    const imageEl = document.createElement('img');
+    imageEl.src = PIC_URLS[i];
+    preloadEl.appendChild(imageEl);
+  }
 };
 
 const chooseRandomPicUrl = (picUrls) => {
@@ -130,8 +143,8 @@ class Game {
         oldestDateIndex = i;
       }
 
-      const centerLeft = window.innerWidth / 2;
-      const centerTop = (2 * i + 1) * (window.innerHeight / (2 * numPics));
+      const centerLeft = WINDOW_WIDTH / 2;
+      const centerTop = (2 * i + 1) * (WINDOW_HEIGHT / (2 * numPics));
       roundPics.push(new Pic(
           picUrl,
           [centerLeft, centerTop],
@@ -167,11 +180,11 @@ class Round {
         totalHeight += this.pics_[i].getSize()[1];
       }
       
-      const totalMargin = Math.max(0, window.innerHeight - totalHeight);
+      const totalMargin = Math.max(0, WINDOW_HEIGHT - totalHeight);
       const eachMargin = totalMargin / (this.pics_.length + 1);
       let currentTop = eachMargin;
       for (let i = 0; i < this.pics_.length; i++) {
-        const left = (window.innerWidth / 2) - (this.pics_[i].getSize()[0] / 2);
+        const left = (WINDOW_WIDTH / 2) - (this.pics_[i].getSize()[0] / 2);
         this.pics_[i].showAtPosition(left, currentTop);
         currentTop += this.pics_[i].getSize()[1] + eachMargin;
       }
