@@ -77,8 +77,8 @@ class Game {
     this.timerEl_.innerHTML = (timeLeftMs / 1000).toFixed(2);
     this.scoreEl_.innerHTML = `${this.currentRoundIndex_} / ${this.numRounds_}`;
 
-    if (timeLeftMs <= 0) {
-      this.lose_();
+    if (this.currentRound_ && timeLeftMs <= 0) {
+      this.currentRound_.endOnTimeout();
     }
   }
 
@@ -173,6 +173,10 @@ class Round {
         currentTop += this.pics_[i].getSize()[1];
       }
     }, PIC_SIZING_TIME_MS);
+  }
+
+  endOnTimeout() {
+    this.onRoundEnd_(/* tappedIndex= */ -1);
   }
 
   onRoundEnd_(tappedIndex) {
