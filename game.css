@@ -1,3 +1,24 @@
+#timer {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+}
+
+#score {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+}
+
+#timer, #score {
+  font-size: 60px;
+}
+
+#timer.lose,
+#score.lose {
+  color: red;
+}
+
 #stage div.pic {
   position: absolute;
 }

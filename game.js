@@ -1,14 +1,18 @@
 const PIC_URL_PREFIX_LENGTH = "pics/".length;
 const PIC_SIZING_TIME_MS = 100;
 const BETWEEN_ROUND_TIME_MS = 1000;
+const NUM_ROUNDS = 10;
+const COUNTDOWN_TIME_MS = 30000;
 
 const main = () => {
-  resetGame(PIC_URLS);
-};
-
-const resetGame = (picUrls) => {
-  const game = new Game(getStage(), picUrls, /* numRounds= */ 10);
-  game.startNextRound();
+  const game = new Game(
+      document.getElementById('stage'),
+      document.getElementById('timer'),
+      document.getElementById('score'),
+      PIC_URLS,
+      NUM_ROUNDS,
+      COUNTDOWN_TIME_MS);
+  game.start();
 };
 
 const chooseRandomPicUrl = (picUrls) => {
@@ -29,20 +33,55 @@ const getMonthName = (month) => {
       : "???";
 };
 
-const getStage = () => {
-  return document.getElementById('stage');
-};
-
 class Game {
-  constructor(stageEl, picUrls, numRounds) {
+  constructor(stageEl, timerEl, scoreEl, picUrls, numRounds, countdownMs) {
     this.stageEl_ = stageEl;
+    this.timerEl_ = timerEl;
+    this.scoreEl_ = scoreEl;
     this.picUrls_ = picUrls;
     this.currentRoundIndex_ = 0;
     this.currentRound_ = null;
     this.numRounds_ = numRounds;
+    this.isGameOver_ = false;
+    this.gameStartTimeMs_ = 0;
+    this.countdownMs_ = countdownMs;
   }
 
-  startNextRound() {
+  start() {
+    this.gameStartTimeMs_ = Date.now();
+    this.maybeUpdateTimerOnAnimationFrame_();
+    this.startNextRound_();
+  }
+
+  maybeUpdateTimerOnAnimationFrame_() {
+    if (this.isGameOver_) {
+      return;
+    }
+
+    this.updateTimerNow_();
+    requestAnimationFrame(() => this.maybeUpdateTimerOnAnimationFrame_());
+  }
+
+  updateTimerNow_() {
+    const timeLeftMs = Math.max(0, this.countdownMs_ - (Date.now() - this.gameStartTimeMs_));
+    this.timerEl_.innerHTML = (timeLeftMs / 1000).toFixed(2);
+    this.scoreEl_.innerHTML = `${this.currentRoundIndex_} / ${this.numRounds_}`;
+
+    if (timeLeftMs <= 0) {
+      this.lose_();
+    }
+  }
+
+  lose_() {
+    this.isGameOver_ = true;
+    this.timerEl_.classList.add('lose');
+    this.scoreEl_.classList.add('lose');
+  }
+
+  startNextRound_() {
+    if (this.isGameOver_) {
+      return;
+    }
     if (this.currentRound_) {
       this.currentRound_.dispose();
     }
@@ -52,18 +91,19 @@ class Game {
 
   onRoundEnd_(didPattyWin) {
     if (!didPattyWin) {
+      this.lose_();
       return;
     }
 
     this.currentRoundIndex_++;
     if (this.currentRoundIndex_ >= this.numRounds_) {
-      // TODO(jven): Handle game victory.
+      this.isGameOver_ = true;
       return;
     }
 
     setTimeout(() => {
       this.stageEl_.innerHTML = '';
-      this.startNextRound();
+      this.startNextRound_();
     }, BETWEEN_ROUND_TIME_MS);
   }
 
