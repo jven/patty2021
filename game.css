@@ -13,6 +13,7 @@
 #stage div.pic div.prettyDate {
   position: absolute;
   text-align: center;
+  font-family: 'Bebas Neue', cursive;
   font-size: 80px;
   width: 400px;
   height: 100px;
@@ -25,7 +26,7 @@
 #stage div.pic.yay img,
 #stage div.pic.dang img,
 #stage div.pic.info img {
-  opacity: 0.6;
+  opacity: 0.4;
 }
 
 #stage div.pic.yay div.prettyDate {
