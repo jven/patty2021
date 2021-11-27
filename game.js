@@ -1,47 +1,14 @@
 const PIC_URL_PREFIX_LENGTH = "pics/".length;
+const PIC_SIZING_TIME_MS = 100;
+const BETWEEN_ROUND_TIME_MS = 1000;
 
 const main = () => {
   resetGame(PIC_URLS);
 };
 
 const resetGame = (picUrls) => {
-  getStage().innerHTML = '';
-
-  const round = generateRandomRound(picUrls, /* numPics= */ 3);
-  round.renderIntoStage(getStage());
-};
-
-const generateRandomRound = (picUrls, numPics) => {
-  const roundPicUrls = [];
-  const roundPicDates = new Set();
-  const roundPics = [];
-  let oldestDate = 999999;
-  let oldestDateIndex = -1;
-  for (let i = 0; i < numPics; i++) {
-    const picUrl = chooseRandomPicUrl(picUrls);
-    const picDate = getDateFromPicUrl(picUrl);
-    if (roundPicDates.has(picDate[0])) {
-      // We chose two pics with the same date, try again.
-      console.log('Collision while generating round, trying again...');
-      return generateRandomRound(picUrls, numPics);
-    }
-
-    roundPicUrls.push(picUrl);
-    roundPicDates.add(picDate[0]);
-    if (picDate[0] < oldestDate) {
-      oldestDate = picDate[0];
-      oldestDateIndex = i;
-    }
-
-    const centerLeft = window.innerWidth / 2;
-    const centerTop = (2 * i + 1) * (window.innerHeight / (2 * numPics));
-    roundPics.push(new Pic(
-        picUrl,
-        [centerLeft, centerTop],
-        /* prettyDate= */ picDate[1]));
-  }
-
-  return new Round(roundPics, /* winningIndex= */ oldestDateIndex);
+  const game = new Game(getStage(), picUrls, /* numRounds= */ 10);
+  game.startNextRound();
 };
 
 const chooseRandomPicUrl = (picUrls) => {
@@ -66,10 +33,83 @@ const getStage = () => {
   return document.getElementById('stage');
 };
 
+class Game {
+  constructor(stageEl, picUrls, numRounds) {
+    this.stageEl_ = stageEl;
+    this.picUrls_ = picUrls;
+    this.currentRoundIndex_ = 0;
+    this.currentRound_ = null;
+    this.numRounds_ = numRounds;
+  }
+
+  startNextRound() {
+    if (this.currentRound_) {
+      this.currentRound_.dispose();
+    }
+    this.currentRound_ = this.generateRandomRound_(this.currentRoundIndex_);
+    this.currentRound_.renderIntoStage(this.stageEl_);
+  }
+
+  onRoundEnd_(didPattyWin) {
+    if (!didPattyWin) {
+      return;
+    }
+
+    this.currentRoundIndex_++;
+    if (this.currentRoundIndex_ >= this.numRounds_) {
+      // TODO(jven): Handle game victory.
+      return;
+    }
+
+    setTimeout(() => {
+      this.stageEl_.innerHTML = '';
+      this.startNextRound();
+    }, BETWEEN_ROUND_TIME_MS);
+  }
+
+  generateRandomRound_(roundIndex) {
+    const numPics = roundIndex < 5 ? 2 : 3;
+    const roundPicUrls = [];
+    const roundPicDates = new Set();
+    const roundPics = [];
+    let oldestDate = 999999;
+    let oldestDateIndex = -1;
+    for (let i = 0; i < numPics; i++) {
+      const picUrl = chooseRandomPicUrl(this.picUrls_);
+      const picDate = getDateFromPicUrl(picUrl);
+      if (roundPicDates.has(picDate[0])) {
+        // We chose two pics with the same date, try again.
+        console.log('Collision while generating round, trying again...');
+        return this.generateRandomRound_(this.picUrls_, numPics);
+      }
+
+      roundPicUrls.push(picUrl);
+      roundPicDates.add(picDate[0]);
+      if (picDate[0] < oldestDate) {
+        oldestDate = picDate[0];
+        oldestDateIndex = i;
+      }
+
+      const centerLeft = window.innerWidth / 2;
+      const centerTop = (2 * i + 1) * (window.innerHeight / (2 * numPics));
+      roundPics.push(new Pic(
+          picUrl,
+          [centerLeft, centerTop],
+          /* prettyDate= */ picDate[1]));
+    }
+
+    return new Round(
+        roundPics,
+        /* winningIndex= */ oldestDateIndex,
+        /* roundEndCallbackFn= */ (didPattyWin) => this.onRoundEnd_(didPattyWin));
+  };
+}
+
 class Round {
-  constructor(pics, winningIndex) {
+  constructor(pics, winningIndex, roundEndCallbackFn) {
     this.pics_ = pics.concat();
     this.winningIndex_ = winningIndex;
+    this.roundEndCallbackFn_ = roundEndCallbackFn;
   }
 
   renderIntoStage(stageEl) {
@@ -95,7 +135,7 @@ class Round {
         this.pics_[i].showAtPosition(left, currentTop);
         currentTop += this.pics_[i].getSize()[1] + eachMargin;
       }
-    }, 100);
+    }, PIC_SIZING_TIME_MS);
   }
 
   onRoundEnd_(tappedIndex) {
@@ -111,6 +151,8 @@ class Round {
       }
       pic.showDateAndRemoveClickHandler(picClass);
     }
+
+    this.roundEndCallbackFn_(tappedIndex == this.winningIndex_);
   }
 
   dispose() {
