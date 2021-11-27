@@ -10,6 +10,7 @@ const main = () => {
       document.getElementById('stage'),
       document.getElementById('timer'),
       document.getElementById('score'),
+      document.getElementById('preload'),
       PIC_URLS,
       NUM_ROUNDS,
       COUNTDOWN_TIME_MS);
@@ -20,6 +21,7 @@ const preloadImages = () => {
   const preloadEl = document.getElementById('preload');
   for (let i = 0; i < PIC_URLS.length; i++) {
     const imageEl = document.createElement('img');
+    imageEl.id = PIC_URLS[i];
     imageEl.src = PIC_URLS[i];
     preloadEl.appendChild(imageEl);
   }
@@ -44,10 +46,11 @@ const getMonthName = (month) => {
 };
 
 class Game {
-  constructor(stageEl, timerEl, scoreEl, picUrls, numRounds, countdownMs) {
+  constructor(stageEl, timerEl, scoreEl, preloadEl, picUrls, numRounds, countdownMs) {
     this.stageEl_ = stageEl;
     this.timerEl_ = timerEl;
     this.scoreEl_ = scoreEl;
+    this.preloadEl_ = preloadEl;
     this.picUrls_ = picUrls;
     this.currentRoundIndex_ = 0;
     this.currentRound_ = null;
@@ -147,10 +150,11 @@ class Game {
         oldestDateIndex = i;
       }
 
-      roundPics.push(new Pic(picUrl, /* prettyDate= */ picDate[1]));
+      roundPics.push(new Pic(this.preloadEl_, picUrl, /* prettyDate= */ picDate[1]));
     }
 
     return new Round(
+        this.preloadEl_,
         roundPics,
         /* winningIndex= */ oldestDateIndex,
         /* roundEndCallbackFn= */ (didPattyWin) => this.onRoundEnd_(didPattyWin));
@@ -158,7 +162,8 @@ class Game {
 }
 
 class Round {
-  constructor(pics, winningIndex, roundEndCallbackFn) {
+  constructor(preloadEl, pics, winningIndex, roundEndCallbackFn) {
+    this.preloadEl_ = preloadEl;
     this.pics_ = pics.concat();
     this.winningIndex_ = winningIndex;
     this.roundEndCallbackFn_ = roundEndCallbackFn;
@@ -212,14 +217,14 @@ class Round {
 }
 
 class Pic {
-  constructor(imageUrl, prettyDate) {
+  constructor(preloadEl, imageUrl, prettyDate) {
+    this.preloadEl_ = preloadEl;
     this.containerEl_ = document.createElement('div');
     this.containerEl_.classList.add('pic');
     this.containerEl_.classList.add('hidden');
 
-    const imageEl = document.createElement('img');
-    imageEl.src = imageUrl;
-    this.containerEl_.appendChild(imageEl);
+    this.imageEl_ = document.getElementById(imageUrl);
+    this.containerEl_.appendChild(this.imageEl_);
 
     const prettyDateEl = document.createElement('div');
     prettyDateEl.classList.add('prettyDate');
@@ -251,6 +256,7 @@ class Pic {
   }
 
   dispose() {
+    this.preloadEl_.appendChild(this.imageEl_);
     this.containerEl_.remove();
   }
 }
