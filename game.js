@@ -1,7 +1,7 @@
 const PIC_URL_PREFIX_LENGTH = "pics/".length;
 const PIC_SIZING_TIME_MS = 100;
 const BETWEEN_ROUND_TIME_MS = 1000;
-const NUM_ROUNDS = 10;
+const NUM_ROUNDS = 3;
 const COUNTDOWN_TIME_MS = 30000;
 
 const main = () => {
@@ -88,6 +88,13 @@ class Game {
     this.scoreEl_.classList.add('lose');
   }
 
+  win_() {
+    this.isGameOver_ = true;
+    this.updateTimerNow_();
+    this.timerEl_.classList.add('win');
+    this.scoreEl_.classList.add('win');
+  }
+
   startNextRound_() {
     if (this.isGameOver_) {
       return;
@@ -107,7 +114,7 @@ class Game {
 
     this.currentRoundIndex_++;
     if (this.currentRoundIndex_ >= this.numRounds_) {
-      this.isGameOver_ = true;
+      this.win_();
       return;
     }
 
