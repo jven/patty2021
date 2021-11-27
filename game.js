@@ -80,6 +80,22 @@ class Round {
         this.onRoundEnd_(/* tappedIndex= */ i);
       });
     }
+
+    setTimeout(() => {
+      let totalHeight = 0;
+      for (let i = 0; i < this.pics_.length; i++) {
+        totalHeight += this.pics_[i].getSize()[1];
+      }
+      
+      const totalMargin = Math.max(0, window.innerHeight - totalHeight);
+      const eachMargin = totalMargin / (this.pics_.length + 1);
+      let currentTop = eachMargin;
+      for (let i = 0; i < this.pics_.length; i++) {
+        const left = (window.innerWidth / 2) - (this.pics_[i].getSize()[0] / 2);
+        this.pics_[i].showAtPosition(left, currentTop);
+        currentTop += this.pics_[i].getSize()[1] + eachMargin;
+      }
+    }, 100);
   }
 
   onRoundEnd_(tappedIndex) {
@@ -125,11 +141,16 @@ class Pic {
 
   renderIntoStage(stageEl) {
     stageEl.appendChild(this.containerEl_);
-    setTimeout(() => {
-      this.containerEl_.style.left = `calc(${this.position_[0]}px - ${this.containerEl_.offsetWidth / 2}px)`;
-      this.containerEl_.style.top = `calc(${this.position_[1]}px - ${this.containerEl_.offsetHeight / 2}px)`;
-      this.containerEl_.classList.remove('hidden');
-    }, 100);
+  }
+
+  getSize() {
+    return [this.containerEl_.offsetWidth, this.containerEl_.offsetHeight];
+  }
+
+  showAtPosition(left, top) {
+    this.containerEl_.style.left = `${left}px`;
+    this.containerEl_.style.top = `${top}px`;
+    this.containerEl_.classList.remove('hidden');
   }
 
   setOnClickHandler(handlerFn) {
