@@ -16,6 +16,10 @@
   bottom: 10px;
 }
 
+#stage {
+  overflow: hidden;
+}
+
 #timer, #score {
   font-family: 'Cairo', sans-serif;
   font-size: 60px;

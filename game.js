@@ -1,6 +1,3 @@
-const WINDOW_WIDTH = window.innerWidth;
-const WINDOW_HEIGHT = window.innerHeight;
-
 const PIC_URL_PREFIX_LENGTH = "pics/".length;
 const PIC_SIZING_TIME_MS = 100;
 const BETWEEN_ROUND_TIME_MS = 1000;
@@ -143,12 +140,7 @@ class Game {
         oldestDateIndex = i;
       }
 
-      const centerLeft = WINDOW_WIDTH / 2;
-      const centerTop = (2 * i + 1) * (WINDOW_HEIGHT / (2 * numPics));
-      roundPics.push(new Pic(
-          picUrl,
-          [centerLeft, centerTop],
-          /* prettyDate= */ picDate[1]));
+      roundPics.push(new Pic(picUrl, /* prettyDate= */ picDate[1]));
     }
 
     return new Round(
@@ -175,18 +167,10 @@ class Round {
     }
 
     setTimeout(() => {
-      let totalHeight = 0;
+      let currentTop = 0;
       for (let i = 0; i < this.pics_.length; i++) {
-        totalHeight += this.pics_[i].getSize()[1];
-      }
-      
-      const totalMargin = Math.max(0, WINDOW_HEIGHT - totalHeight);
-      const eachMargin = totalMargin / (this.pics_.length + 1);
-      let currentTop = eachMargin;
-      for (let i = 0; i < this.pics_.length; i++) {
-        const left = (WINDOW_WIDTH / 2) - (this.pics_[i].getSize()[0] / 2);
-        this.pics_[i].showAtPosition(left, currentTop);
-        currentTop += this.pics_[i].getSize()[1] + eachMargin;
+        this.pics_[i].showAtPosition(0, currentTop);
+        currentTop += this.pics_[i].getSize()[1];
       }
     }, PIC_SIZING_TIME_MS);
   }
@@ -217,9 +201,7 @@ class Round {
 }
 
 class Pic {
-  constructor(imageUrl, position, prettyDate) {
-    this.position_ = position;
-
+  constructor(imageUrl, prettyDate) {
     this.containerEl_ = document.createElement('div');
     this.containerEl_.classList.add('pic');
     this.containerEl_.classList.add('hidden');
