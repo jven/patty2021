@@ -15,6 +15,7 @@ const main = () => {
         document.getElementById('timer'),
         document.getElementById('score'),
         document.getElementById('preload'),
+        document.getElementById('bye'),
         PIC_URLS,
         NUM_ROUNDS,
         COUNTDOWN_TIME_MS);
@@ -86,11 +87,12 @@ const getMonthName = (month) => {
 };
 
 class Game {
-  constructor(stageEl, timerEl, scoreEl, preloadEl, picUrls, numRounds, countdownMs) {
+  constructor(stageEl, timerEl, scoreEl, preloadEl, byeEl, picUrls, numRounds, countdownMs) {
     this.stageEl_ = stageEl;
     this.timerEl_ = timerEl;
     this.scoreEl_ = scoreEl;
     this.preloadEl_ = preloadEl;
+    this.byeEl_ = byeEl;
     this.picUrls_ = picUrls;
     this.currentRoundIndex_ = 0;
     this.currentRound_ = null;
@@ -136,6 +138,7 @@ class Game {
     this.updateTimerNow_();
     this.timerEl_.classList.add('win');
     this.scoreEl_.classList.add('win');
+    this.byeEl_.classList.add('woohoo');
   }
 
   startNextRound_() {
