@@ -5,7 +5,11 @@ const NUM_ROUNDS = 3;
 const COUNTDOWN_TIME_MS = 30000;
 
 const main = () => {
-  preloadImages().then(() => {
+  Promise.all([
+    preloadImages(),
+    showHello()
+  ]).then(() => {
+    hideHello();
     const game = new Game(
         document.getElementById('stage'),
         document.getElementById('timer'),
@@ -17,6 +21,19 @@ const main = () => {
     game.start();
   });
 };
+
+const showHello = () => {
+  const helloEl = document.getElementById('hello');
+
+  const p = new Promise((resolveFn, rejectFn) => {
+    helloEl.onclick = () => resolveFn();
+  });
+  return p;
+};
+
+const hideHello = () => {
+  document.getElementById('hello').style.display = 'none';
+}
 
 const preloadImages = () => {
   const preloadEl = document.getElementById('preload');
