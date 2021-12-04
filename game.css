@@ -2,12 +2,16 @@ body {
   margin: 0;
 }
 
-#hello, #bye {
+#hello, #bye, #rere {
   position: fixed;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
+}
+
+#hello.hidden {
+  display: none;
 }
 
 #hello #instructions {
@@ -185,7 +189,6 @@ body {
 
 #bye {
   background-color: black;
-  color: white;
   opacity: 0;
   display: none;
   z-index: 200;
@@ -203,6 +206,7 @@ body {
 }
 
 #bye #puzzle {
+  color: white;
   font-size: 40px;
   position: absolute;
   left: 100px;
@@ -212,4 +216,31 @@ body {
 
 #bye #puzzle p:nth-child(4n) {
   margin-bottom: 100px;
+}
+
+#rere {
+  display: none;
+  background-color: rgba(0, 0, 0, 0.75);
+  opacity: 0;
+  z-index: 199;
+}
+
+#rere.lose {
+  display: block;
+  animation: fadeIn linear 1s;
+  -webkit-animation: fadeIn linear 1s;
+  -moz-animation: fadeIn linear 1s;
+  -o-animation: fadeIn linear 1s;
+  -ms-animation: fadeIn linear 1s;
+  animation-fill-mode: forwards;
+  animation-delay: 2000ms;
+}
+
+#rere #reremessage {
+  color: white;
+  font-size: 80px;
+  position: absolute;
+  left: 100px;
+  top: 100px;
+  font-family: 'Arvo', serif;
 }

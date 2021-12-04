@@ -5,6 +5,17 @@ const NUM_ROUNDS = 10;
 const COUNTDOWN_TIME_MS = 30000;
 
 const main = () => {
+  document.getElementById('hello').className = '';
+  document.getElementById('stage').innerHTML = '';
+  document.getElementById('stage').className = '';
+  document.getElementById('timer').innerHTML = '';
+  document.getElementById('timer').className = '';
+  document.getElementById('score').innerHTML = '';
+  document.getElementById('score').className = '';
+  document.getElementById('preload').innerHTML = '';
+  document.getElementById('rere').className = '';
+  document.getElementById('rere').onclick = () => main();
+
   Promise.all([
     preloadImages(),
     showHello()
@@ -16,6 +27,7 @@ const main = () => {
         document.getElementById('score'),
         document.getElementById('preload'),
         document.getElementById('bye'),
+        document.getElementById('rere'),
         PIC_URLS,
         NUM_ROUNDS,
         COUNTDOWN_TIME_MS);
@@ -33,7 +45,7 @@ const showHello = () => {
 };
 
 const hideHello = () => {
-  document.getElementById('hello').style.display = 'none';
+  document.getElementById('hello').classList.add('hidden');
 }
 
 const preloadImages = () => {
@@ -87,12 +99,13 @@ const getMonthName = (month) => {
 };
 
 class Game {
-  constructor(stageEl, timerEl, scoreEl, preloadEl, byeEl, picUrls, numRounds, countdownMs) {
+  constructor(stageEl, timerEl, scoreEl, preloadEl, byeEl, restartEl, picUrls, numRounds, countdownMs) {
     this.stageEl_ = stageEl;
     this.timerEl_ = timerEl;
     this.scoreEl_ = scoreEl;
     this.preloadEl_ = preloadEl;
     this.byeEl_ = byeEl;
+    this.restartEl_ = restartEl;
     this.picUrls_ = picUrls;
     this.currentRoundIndex_ = 0;
     this.currentRound_ = null;
@@ -132,6 +145,7 @@ class Game {
     this.stageFlash_('flashLose');
     this.timerEl_.classList.add('lose');
     this.scoreEl_.classList.add('lose');
+    this.restartEl_.classList.add('lose');
   }
 
   win_() {
@@ -174,7 +188,9 @@ class Game {
   }
 
   stageFlash_(className) {
+    this.stageEl_.classList.remove('flashLose');
     this.stageEl_.classList.remove('flashGood');
+    this.stageEl_.classList.remove('flashWin');
     // Needed to restart animation.
     void this.stageEl_.offsetWidth;
     this.stageEl_.classList.add(className);
