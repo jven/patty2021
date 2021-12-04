@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+}
+
 #hello, #bye {
   position: fixed;
   left: 0;
@@ -77,6 +81,45 @@
 
 #stage {
   overflow: hidden;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+#stage.flashLose {
+  animation-name: stageFlashBad;
+  animation-duration: 0.6s;
+  animation-iteration-count: 1;
+}
+
+#stage.flashGood {
+  animation-name: stageFlashGood;
+  animation-duration: 0.6s;
+  animation-iteration-count: 1;
+}
+
+#stage.flashWin {
+  animation-name: stageFlashGood;
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
+}
+
+@keyframes stageFlashBad {
+  0% {
+    background-color: rgba(255, 0, 0, 0.2);
+  }
+  100% {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+@keyframes stageFlashGood {
+  0% {
+    background-color: rgba(0, 255, 0, 0.2);
+  }
+  100% {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
 }
 
 #timer, #score {

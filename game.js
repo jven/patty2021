@@ -129,6 +129,7 @@ class Game {
 
   lose_() {
     this.isGameOver_ = true;
+    this.stageFlash_('flashLose');
     this.timerEl_.classList.add('lose');
     this.scoreEl_.classList.add('lose');
   }
@@ -136,6 +137,7 @@ class Game {
   win_() {
     this.isGameOver_ = true;
     this.updateTimerNow_();
+    this.stageFlash_('flashWin');
     this.timerEl_.classList.add('win');
     this.scoreEl_.classList.add('win');
     this.byeEl_.classList.add('woohoo');
@@ -158,6 +160,7 @@ class Game {
       return;
     }
 
+    this.stageFlash_('flashGood');
     this.currentRoundIndex_++;
     if (this.currentRoundIndex_ >= this.numRounds_) {
       this.win_();
@@ -168,6 +171,13 @@ class Game {
       this.stageEl_.innerHTML = '';
       this.startNextRound_();
     }, BETWEEN_ROUND_TIME_MS);
+  }
+
+  stageFlash_(className) {
+    this.stageEl_.classList.remove('flashGood');
+    // Needed to restart animation.
+    void this.stageEl_.offsetWidth;
+    this.stageEl_.classList.add(className);
   }
 
   generateRandomRound_(roundIndex) {
