@@ -1,0 +1,56 @@
+p {
+  margin: 0;
+  padding: 0;
+}
+
+#container {
+  position: fixed;
+  top: 0;
+  left: calc(50% - 400px);
+  width: 800px;
+}
+
+#top {
+  font-family: 'Amatic SC', cursive;
+  font-size: 50px;
+  font-weight: 700;
+
+  width: 500px;
+  margin: 150px auto;
+}
+
+#top p {
+  margin-bottom: 30px;
+}
+
+#bottom {
+  border: solid 3px black;
+  display: flex;
+  flex-direction: row;
+  padding: 30px;
+
+  font-family: 'Special Elite', cursive;
+  font-size: 28px;
+}
+
+#bottom #left {
+  align-self: center;
+  width: 40%;
+}
+
+#bottom #right {
+  width: 60%;
+}
+
+#bottom #right p {
+  margin-bottom: 8px;
+}
+
+#bottom #right img {
+  display: block;
+  margin: 0 auto;
+}
+
+#bottom #right #when {
+  margin-top: 20px;
+}
