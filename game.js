@@ -163,6 +163,7 @@ class Game {
     }
     if (this.currentRound_) {
       this.currentRound_.dispose();
+      this.currentRound_ = null;
     }
     this.currentRound_ = this.generateRandomRound_(this.currentRoundIndex_);
     this.currentRound_.renderIntoStage(this.stageEl_);
@@ -198,6 +199,7 @@ class Game {
 
   generateRandomRound_(roundIndex) {
     const numPics = roundIndex < 5 ? 2 : 3;
+    console.log(`Generating round ${roundIndex} with ${numPics} pics`);
     const roundPicUrls = [];
     const roundPicDates = new Set();
     const roundPics = [];
@@ -291,6 +293,9 @@ class Pic {
     this.containerEl_.classList.add('hidden');
 
     this.imageEl_ = document.getElementById(imageUrl);
+    if (!this.imageEl_) {
+      console.error(`Couldn't find image el: ${imageUrl}`);
+    }
     this.containerEl_.appendChild(this.imageEl_);
 
     const prettyDateEl = document.createElement('div');
