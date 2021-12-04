@@ -1,7 +1,7 @@
 const PIC_URL_PREFIX_LENGTH = "pics/".length;
 const PRELOAD_INTERVAL_MS = 300;
 const BETWEEN_ROUND_TIME_MS = 1000;
-const NUM_ROUNDS = 3;
+const NUM_ROUNDS = 10;
 const COUNTDOWN_TIME_MS = 30000;
 
 const main = () => {
@@ -183,7 +183,7 @@ class Game {
       if (roundPicDates.has(picDate[0])) {
         // We chose two pics with the same date, try again.
         console.log('Collision while generating round, trying again...');
-        return this.generateRandomRound_(this.picUrls_, numPics);
+        return this.generateRandomRound_(roundIndex);
       }
 
       roundPicUrls.push(picUrl);
